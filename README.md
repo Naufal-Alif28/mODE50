@@ -1,5 +1,8 @@
 ## This is mODE50 
 
+by Naufal-Alif28
+[Access it here](https://mode50-git-361071048790.asia-southeast2.run.app/)
+
 **mODE50** simplifies the work of fitting a bioprocess time-series dataset, consisting of biomass, substrate, and product concentrations, to the Monod ODE system model. It receive a bioprocess dataset in `.csv` format as an input and execute model fitting and graph visualisation in one go. 
 
 The name mODE50 stands for **"Monod Ordinary Differential Equation 50"**. Monod ODE system is a model usually used to describe the dynamics of the concentration of biomass (X, i.e. the concentration of cells), substrate (S, e.g. glucose), and product (P, e.g. organic acid) with respect to time (t) in a bioreactor. The app also **supports user registration, login, as well as saving and opening projects** containing the fitting and graphing results. 
@@ -58,7 +61,7 @@ You will see four sections on the dashboard:
  * You can `Logout` from your account by clicking the `Profile` button.
 
 ### Academic Information
-mODE50 is made for the final project of [Harvard CS50's Introduction to Computer Science](https://cs50.harvard.edu/x/). This web-app is made on Flask framework, utilising CoreUI, a Bootstrap-based visual framework. The app is hosted on a free-tier [Render](https://www.render.com) cloud web server. [Uptimerobot](https://uptimerobot.com/) is used to prevent the web from the default Render downtime after 15 minutes of inactivity. This ensures that the web-app is accessible promplty for longer*. 
+mODE50 is made for the final project of [Harvard CS50's Introduction to Computer Science](https://cs50.harvard.edu/x/). This web-app is made on Flask framework, utilising CoreUI, a Bootstrap-based visual framework. The app is hosted on a free-tier Google Cloud Run.
 
 Generative AI models was used in the creation of the work, with the following details:
 * The app came from author's original idea

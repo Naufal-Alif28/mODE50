@@ -55,7 +55,7 @@ You will see four sections on the dashboard:
 
  > **Saving your project with the same name with an existing one will rewrite it!**
 
- > A project is saved into the database in a JSON format containing `name (str)`, `df (JSONified Pandas DataFrame)`, `coeff (dict)`, and `plotter (dict)`. `df` stores the bioprocess dataset, `coeff` stores kinetic parameters (coefficients) obtained from model fitting, and `plotter` serves as the basis for `Plotify.js` to render a graph produced from a model fitting. A filename sanitisation is implemented automatically.
+ > A project is saved into the database in a JSON format containing `name (str)`, `df (JSONified Pandas DataFrame)`, `coeff (dict)`, and `plotter (dict)`. `df` stores the bioprocess dataset, `coeff` stores kinetic parameters (coefficients) obtained from model fitting, and `plotter` serves as the basis for `Plotly.js` to render a graph produced from a model fitting. A filename sanitisation is implemented automatically.
 
  * When `Fit model` is clicked, the dataset you uploaded will be fitted to the Monod ODE system model. This might take a while. The resulting kinetic parameters and graph will be presented after.
 

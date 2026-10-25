@@ -1,6 +1,7 @@
 dotenv
 Flask
 Flask_session
+gunicorn
 psycopg
 pandas
 scipy

@@ -1,0 +1,6 @@
+.env
+.vscode
+.venv
+dummy/
+__pycache__/
+flask_session/

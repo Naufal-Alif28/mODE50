@@ -1,0 +1,196 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block style %}
+    <style>
+        :root { --ribbon-h: 56px; --gap: .75rem; }
+        html, body { height: 100%; }
+        body { background: var(--cui-tertiary-bg); }
+
+        /* Top ribbon */
+        .ribbon {
+        height: var(--ribbon-h);
+        background: var(--cui-body-bg);
+        border-bottom: 1px solid var(--cui-border-color);
+        }
+        .ribbon .project-name { max-width: 280px; font-weight: 600; }
+
+        /* Dashboard grid: left = graph (2 quadrants tall), right = CSV + results (1 quadrant each) */
+        .dashboard {
+        height: calc(100vh - var(--ribbon-h));
+        padding: var(--gap);
+        display: grid;
+        gap: var(--gap);
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas:
+            "graph csv"
+            "graph params";
+        }
+        .panel-graph  { grid-area: graph; }
+        .panel-csv    { grid-area: csv; }
+        .panel-params { grid-area: params; }
+
+        /* Stack on small screens */
+        @media (max-width: 991.98px) {
+        .dashboard {
+            height: auto;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto;
+            grid-template-areas: "graph" "csv" "params";
+        }
+        .panel { min-height: 360px; }
+        }
+
+        .panel { display: flex; flex-direction: column; min-height: 0; }
+        .panel .card-body { flex: 1 1 auto; min-height: 0; overflow: auto; }
+
+        /* Graph placeholder */
+        #plotArea { height: 100%; min-height: 600px; display: flex; align-items: center; justify-content: center; }
+
+        /* CSV table with sticky header */
+        #csvTable thead th { position: sticky; top: 0; background: var(--cui-body-bg); z-index: 1; }
+        #csvTable td, #csvTable th { white-space: nowrap; }
+    </style>
+{% endblock %}
+
+{% block main %}
+      <!-- ===== TOP RIBBON ===== -->
+  <header class="ribbon d-flex align-items-center gap-2 px-3">
+    <strong class="me-2">mODE50</strong>
+
+    <input id="projectName" type="text" class="form-control form-control-sm project-name"
+           value="Untitled project" aria-label="Project name">
+
+    <div class="vr mx-2"></div>
+
+    <!-- New (upload a new csv) -->
+     <form id="uploadNew" action="/upload" method="post" enctype="multipart/form-data">
+        <input id="inputNew" type="file" accept=".csv" hidden>
+        <button id="btnOpen" class="btn btn-sm btn-outline-primary" type="button">New</button>
+     </form>
+
+    <!-- Open (a saved project from the database) -->
+    <div class="dropdown" id="openProjectDropdown">
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
+              data-coreui-toggle="dropdown" aria-expanded="false">
+        Open
+      </button>
+      <ul class="dropdown-menu" id="projectList" style="min-width: 260px; max-height: 320px; overflow-y: auto;">
+        <li><span class="dropdown-item-text text-body-secondary">Loading…</span></li>
+      </ul>
+    </div>
+
+    <!-- Save (as JSON to database) -->
+    <div class="btn-group">
+      <button id="btnSave" class="btn btn-sm btn-primary" type="button">Save</button>
+    </div>
+
+    <div class="ms-auto d-flex gap-2">
+      <button id="btnFit" class="btn btn-sm btn-success" type="button">Fit model</button>
+      <a class="nav-link py-0 pe-0" data-coreui-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+        <div class="avatar avatar-md"><img class="avatar-img" src="static/assets/img/avatars/0.jpg" alt="user"></div>
+      </a>
+      <div class="dropdown-menu dropdown-menu-end pt-0">
+      <div class="dropdown-header bg-body-tertiary text-body-secondary fw-semibold rounded-top mb-2">Account</div>
+        <a class="dropdown-item" href="/logout">
+            <svg class="icon me-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path fill="var(--ci-primary-color, currentcolor)" d="M77.155 272.034H351.75v-32.001H77.155l75.053-75.053v-.001l-22.628-22.626-113.681 113.68.001.001h-.001L129.58 369.715l22.628-22.627v-.001z" class="ci-primary" />
+            <path fill="var(--ci-primary-color, currentcolor)" d="M160 16v32h304v416H160v32h336V16z" class="ci-primary" />
+            </svg>
+            Logout
+        </a>
+</div>
+  </header>
+
+  <!-- ===== MAIN DASHBOARD ===== -->
+  <main class="dashboard">
+    <!-- alert placeholder -->
+    <div id="liveAlertPlaceholder" style="position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); width: min(600px, calc(100% - 2rem)); z-index: 1080;"></div>
+    <!-- Graph panel (left, two quadrants tall) -->
+    <section class="card panel panel-graph">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Fitted curves</span>
+        <span class="text-body-secondary small" id="fitStatus">No fit yet</span>
+      </div>
+      <div class="card-body">
+        <div id="plotArea">
+          <span class="text-body-secondary" id="plot-placeholder-text">
+            <p>Open a CSV and run the fit to see biomass, substrate and product curves.</p>
+            <p>or open a saved project, or use the <u>example project</u></p>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CSV viewer (top right) -->
+    <section class="card panel panel-csv">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Data</span>
+        <span class="text-body-secondary small" id="csvInfo">0 rows</span>
+      </div>
+      <div class="card-body p-0">
+        <table id="csvTable" class="table table-sm table-striped table-hover mb-0">
+          <thead><tr><th>time</th><th>biomass</th><th>substrate</th><th>product</th></tr></thead>
+          <tbody>
+            <tr><td colspan="4" class="text-center text-body-secondary py-4">No data loaded</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Kinetic parameters (bottom right) -->
+    <section class="card panel panel-params">
+      <div class="card-header">Kinetic parameters</div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Parameter</th><th>Value</th><th>Unit</th></tr></thead>
+          <tbody id="paramBody">
+            <tr><td>&mu;<sub>max</sub></td><td id="mu">&ndash;</td><td>1/h</td></tr>
+            <tr><td>K<sub>s</sub></td><td id="Ks">&ndash;</td><td>g/L</td></tr>
+            <tr><td>Y<sub>X/S</sub></td><td id="Yxs">&ndash;</td><td>g/g</td></tr>
+            <tr><td>Y<sub>P/X</sub></td><td id="Ypx">&ndash;</td><td>g/g</td></tr>
+            <tr><td>R<sup>2</sup> (X)</td><td id="R2X">&ndash;</td><td></td></tr>
+            <tr><td>R<sup>2</sup> (S)</td><td id="R2S">&ndash;</td><td></td></tr>
+            <tr><td>R<sup>2</sup> (P)</td><td id="R2P">&ndash;</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+  
+  <!-- CoreUI and necessary plugins-->
+  <script src="static/vendors/@coreui/coreui/js/coreui.bundle.min.js"></script>
+  <script src="static/vendors/simplebar/js/simplebar.min.js"></script>
+  <!-- PLotly.js -->
+  <script src="https://cdn.plot.ly/plotly-4.1.1.min.js" charset="utf-8"></script>
+  <!-- main script -->
+  <script src="static/js/dashboard.js"></script>
+  <!-- prevent reload when changd unsaved -->
+  <script>
+    // // 1. Keep track of whether the form state has changed
+    // let isDirty = false;
+
+    // // 2. Set the flag to true whenever a user types or changes an input
+    // const form = document.querySelector('#myForm');
+    // form.addEventListener('input', () => {
+    //     isDirty = true;
+    // });
+
+    // // 3. Reset the flag to false when the form is submitted normally
+    // form.addEventListener('submit', () => {
+    //     isDirty = false;
+    // });
+
+    // // 4. Intercept the page unload if changes are unsaved
+    // window.addEventListener('beforeunload', (event) => {
+    //     if (isDirty) {
+    //         // Modern browsers require preventDefault() and setting returnValue
+    //         event.preventDefault();
+    //         event.returnValue = ''; 
+    //     }
+    // });
+  </script>
+{% endblock %}

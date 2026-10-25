@@ -1,0 +1,67 @@
+## This is mODE50 
+
+**mODE50** simplifies the work of fitting a bioprocess time-series dataset, consisting of biomass, substrate, and product concentrations, to the Monod ODE system model. It receive a bioprocess dataset in `.csv` format as an input and execute model fitting and graph visualisation in one go. 
+
+The name mODE50 stands for **"Monod Ordinary Differential Equation 50"**. Monod ODE system is a model usually used to describe the dynamics of the concentration of biomass (X, i.e. the concentration of cells), substrate (S, e.g. glucose), and product (P, e.g. organic acid) with respect to time (t) in a bioreactor. The app also **supports user registration, login, as well as saving and opening projects** containing the fitting and graphing results. 
+
+The Monod ODE system goes as:
+
+$$
+ \frac{dX}{dt}=\mu X  
+$$
+$$
+\mu = \mu _{max}\frac{S}{K_{s}+S}
+$$
+$$
+\frac{dS}{dt}=-\frac{1}{Y_{XS}}\frac{dX}{dt}
+$$
+$$
+\frac{dP}{dt}=Y_{PX}\frac{dX}{dt}
+$$
+
+Biotechnologists would fit their bioprocess dataset to the model, and use the fitted model (with all the kinetic parameters) to predict the behaviour (i.e. the concentration of each variable at a given time) of a bioprocess system in the future runs.
+
+The app is a final project work for the [Harvard CS50's Introduction to Computer Science](https://cs50.harvard.edu/x/), hence the suffix "50".
+
+### Registration
+* To register, enter a username and a password, and re-type your password to confirm it.
+* The username must be unique. A username will be rejected if it already exists.
+* The confirmation must match your password.
+
+### Login
+* To login, you need an account. Register if you do not have one yet by clicking the registration link.
+* Type your username and password. If both are correct, you will be directed to the main dashboard
+
+### Main Dashboard
+You will see four sections on the dashboard:
+ 1. _Top ribbon_, consists of `New`, `Open`, `Save`, `Fit model`, and profile buttons.
+ 2. _Plot viewer_
+ 3. _CSV viewer_
+ 4. _Coefficient table_
+ 
+ * The `New` button allows you to upload a `.csv` file containing a bioprocess time-series dataset. The csv file must consists of four columns with headers named **time, biomass, substrate, product**, or alternatively **t, X, S, P** (case-insensitive). If your table contains any invalid header name and/or invalid data (i.e. non-numeric or null values), the `.csv` file will be rejected. Once the dataset is uploaded, it should appear in the _CSV viewer_ section. 
+
+> To prevent overload, the dataset length is capped at 100 lines
+
+ * Clicking the `Open` button will open a list of saved projects, including a default **example project**. Once, you click a project, it will be loaded to the dashboard.
+
+ * The `Save` button allows you to save your project. The project can be a completed fitting result, or any partial results (e.g. only name, or CSV without fitting results). To save, you first need to specify a name for you project. Not giving one will raise an error.
+
+ > **Saving your project with the same name with an existing one will rewrite it!**
+
+ > A project is saved into the database in a JSON format containing `name (str)`, `df (JSONified Pandas DataFrame)`, `coeff (dict)`, and `plotter (dict)`. `df` stores the bioprocess dataset, `coeff` stores kinetic parameters (coefficients) obtained from model fitting, and `plotter` serves as the basis for `Plotify.js` to render a graph produced from a model fitting. A filename sanitisation is implemented automatically.
+
+ * When `Fit model` is clicked, the dataset you uploaded will be fitted to the Monod ODE system model. This might take a while. The resulting kinetic parameters and graph will be presented after.
+
+ > The fitting is carried out on the backend (server). It utilises `scipy.optimize.minimize()` to find the optimal kinetic parameters, and `scipy.integrate.solve_ivp()` to do numeric simulation of the fitted model.
+
+ * You can `Logout` from your account by clicking the `Profile` button.
+
+### Academic Information
+mODE50 is made for the final project of [Harvard CS50's Introduction to Computer Science](https://cs50.harvard.edu/x/). This web-app is made on Flask framework, utilising CoreUI, a Bootstrap-based visual framework. The app is hosted on a free-tier [Render](https://www.render.com) cloud web server. [Uptimerobot](https://uptimerobot.com/) is used to prevent the web from the default Render downtime after 15 minutes of inactivity. This ensures that the web-app is accessible promplty for longer*. 
+
+Generative AI models was used in the creation of the work, with the following details:
+* The app came from author's original idea
+* The `login` and `registration` screen mostly built on templates from coreUI, modified by the author.
+* The inital draft of HTML layout, JavaScript scripts (for buttons and dropdowns functionalities), and CSS stylesheet for the main dashboard was generated using Claude AI. The author changed a number of buttons and features as needed. The author also reused and adapted the JS building blocks generated by AI to expand the functionalities.
+* The Flask backend written in Python was mostly built by the author. When generative AI is used, the principle is to not use VS Code's Copilot (since it can read the code directly) and to use Claude instead to generate chunks of code, with giving onyl descriptive prompts and not the source code. This ensure the author to still contribute in linking the generated code to the rest of the program. Copilot was mostly used for debugging.

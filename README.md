@@ -1,7 +1,10 @@
 ## This is mODE50 
 
 by Naufal-Alif28
+
 [Access it here](https://mode50-git-361071048790.asia-southeast2.run.app/)
+
+watch the demo [here](https://youtu.be/wziOoBdSMcg)
 
 **mODE50** simplifies the work of fitting a bioprocess time-series dataset, consisting of biomass, substrate, and product concentrations, to the Monod ODE system model. It receive a bioprocess dataset in `.csv` format as an input and execute model fitting and graph visualisation in one go. 
 

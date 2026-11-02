@@ -4,7 +4,7 @@ by Naufal-Alif28
 
 [Access it here](https://mode50-git-361071048790.asia-southeast2.run.app/)
 
-<img width="800" height="450" alt="quick-demo_mODE50" src="https://github.com/user-attachments/assets/d175a34f-8ed2-43db-b4d9-25fd3b2ccbfc" />
+<img width="400" height="225" alt="quick-demo_mODE50" src="https://github.com/user-attachments/assets/cb300e02-9d2e-4a15-9075-e3c5aee0aae9" />
 
 watch the demo [here](https://youtu.be/wziOoBdSMcg)
 

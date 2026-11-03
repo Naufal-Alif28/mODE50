@@ -2,7 +2,7 @@
 
 by Naufal-Alif28
 
-[Access it here](https://mode50-git-361071048790.asia-southeast2.run.app/)
+🔗 [Access it here](https://mode50.cloud.run)
 
 <img width="800" height="450" alt="quick-demo_mODE50" src="https://github.com/user-attachments/assets/d976c3de-ad5b-4795-90ec-60e72b3cbd6e" />
 
